@@ -63,7 +63,7 @@ class CoinbaseWrappedClient:
         try:
             payload = await response.json()
         except Exception:
-            payload = {"text": await response.text()}
+            payload = await response.text()
 
         if status == 429 or status >= 500:
             logger.warning("Coinbase Wrapped API throttled or errored with status %s. Retrying...", status)

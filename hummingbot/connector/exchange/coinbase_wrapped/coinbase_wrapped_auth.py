@@ -1,5 +1,5 @@
-import json
 import hmac
+import json
 import logging
 from typing import Any, Dict, Optional
 from urllib.parse import urlparse
@@ -7,7 +7,7 @@ from urllib.parse import urlparse
 from hummingbot.connector.exchange.coinbase_wrapped import coinbase_wrapped_constants as constants
 from hummingbot.connector.time_synchronizer import TimeSynchronizer
 from hummingbot.core.web_assistant.auth import AuthBase
-from hummingbot.core.web_assistant.connections.data_types import RESTMethod, RESTRequest
+from hummingbot.core.web_assistant.connections.data_types import RESTMethod, RESTRequest, WSRequest
 from hummingbot.logger import HummingbotLogger
 
 
@@ -51,4 +51,7 @@ class CoinbaseWrappedAuth(AuthBase):
         request.headers = headers
         if payload_str and isinstance(request.data, dict):
             request.data = payload_str
+        return request
+
+    async def ws_authenticate(self, request: WSRequest) -> WSRequest:
         return request
