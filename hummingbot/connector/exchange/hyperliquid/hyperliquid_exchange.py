@@ -22,7 +22,7 @@ from hummingbot.connector.trading_rule import TradingRule
 from hummingbot.connector.utils import TradeFillOrderDetails, combine_to_hb_trading_pair, get_new_client_order_id
 from hummingbot.core.api_throttler.data_types import RateLimit
 from hummingbot.core.data_type.common import OrderType, TradeType
-from hummingbot.core.data_type.in_flight_order import InFlightOrder, OrderUpdate, TradeUpdate
+from hummingbot.core.data_type.in_flight_order import InFlightOrder, OrderState, OrderUpdate, TradeUpdate
 from hummingbot.core.data_type.order_book_tracker_data_source import OrderBookTrackerDataSource
 from hummingbot.core.data_type.trade_fee import DeductedFromReturnsTradeFee, TokenAmount, TradeFeeBase
 from hummingbot.core.data_type.user_stream_tracker_data_source import UserStreamTrackerDataSource
@@ -524,10 +524,19 @@ class HyperliquidExchange(ExchangePyBase):
             self.logger().debug(f"Ignoring order message with id {client_order_id}: not in in_flight_orders.")
             return
         current_state = order_msg["status"]
+        try:
+            new_state = CONSTANTS.ORDER_STATE[current_state]
+        except KeyError:
+            self.logger().warning(
+                "Received order update with unknown status '%s'. Falling back to FAILED state.",
+                current_state,
+            )
+            new_state = OrderState.FAILED
+
         order_update: OrderUpdate = OrderUpdate(
             trading_pair=tracked_order.trading_pair,
             update_timestamp=order_msg["statusTimestamp"] * 1e-3,
-            new_state=CONSTANTS.ORDER_STATE[current_state],
+            new_state=new_state,
             client_order_id=order_msg["order"]["cloid"],
             exchange_order_id=str(order_msg["order"]["oid"]),
         )
