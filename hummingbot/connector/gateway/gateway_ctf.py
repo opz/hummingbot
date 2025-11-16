@@ -11,7 +11,7 @@ class GatewayCtf(GatewayBase):
         try:
             tx = await gateway_instance.api_request(
                 "post",
-                f"/connectors/{self.connector_name}/splitPosition",
+                f"/connectors/{self.connector_name}/split-position",
                 {
                     "conditionId": conditionId,
                     "amount": amount,
