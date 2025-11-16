@@ -415,16 +415,24 @@ class GatewayHttpClient:
                 if len(params) > 0:
                     if use_body:
                         response = await client.get(url, json=params)
+                        self.logger().network(f"URL: {params}")
+                        self.logger().network(f"Response: {response}")
                     else:
                         response = await client.get(url, params=params)
+                        self.logger().network(f"URL: {params}")
+                        self.logger().network(f"Response: {response}")
                 else:
                     response = await client.get(url)
+                    self.logger().network(f"Response: {response}")
             elif method == "post":
                 response = await client.post(url, json=params)
+                self.logger().network(f"Response: {response}")
             elif method == 'put':
                 response = await client.put(url, json=params)
+                self.logger().network(f"Response: {response}")
             elif method == 'delete':
                 response = await client.delete(url, json=params)
+                self.logger().network(f"Response: {response}")
             else:
                 raise ValueError(f"Unsupported request method {method}")
             if not fail_silently and response.status == 504:
@@ -432,6 +440,7 @@ class GatewayHttpClient:
             else:
                 try:
                     parsed_response = await response.json()
+                    self.logger().network(f"Parsed response: {parsed_response}")
                 except ContentTypeError:
                     parsed_response = await response.text()
                 if response.status != 200 and \
