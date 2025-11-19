@@ -22,6 +22,7 @@ class ConnectorType(Enum):
     SWAP = "SWAP"
     CLMM = "CLMM"
     AMM = "AMM"
+    CTF = "CTF"
 
 
 class TransactionStatus(Enum):
@@ -44,6 +45,8 @@ def get_connector_type(connector_name: str) -> ConnectorType:
         return ConnectorType.CLMM
     elif "/amm" in connector_name:
         return ConnectorType.AMM
+    elif "/ctf" in connector_name:
+        return ConnectorType.CTF
     return ConnectorType.SWAP
 
 

@@ -105,6 +105,8 @@ class ConnectorSetting(NamedTuple):
             connector_type = get_connector_type(self.name)
             if connector_type in [GatewayConnectorType.AMM, GatewayConnectorType.CLMM]:
                 return "gateway.gateway_lp"
+            elif connector_type in [GatewayConnectorType.CTF]:
+                return "gateway.gateway_ctf"
             # Default to swap for all other types
             return "gateway.gateway_swap"
 
