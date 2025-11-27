@@ -42,9 +42,9 @@ class GatewayCtf(GatewayBase):
 
             signature: Optional[str] = tx.get("signature")
             if signature is not None and signature != "":
+                # Only start tracking orders after we successfully get a transaction hash
                 for trading_pair in trading_pairs:
-                    order_id = order_ids[trading_pair]
-                    self.update_order_from_hash(order_id, trading_pair, signature, tx)
+                    self.update_order_from_hash(order_ids[trading_pair], trading_pair, signature, tx)
 
                 return signature
             else:
@@ -52,4 +52,6 @@ class GatewayCtf(GatewayBase):
         except asyncio.CancelledError:
             raise
         except Exception as e:
-            self._handle_operation_failure(order_id, trading_pair, "submitting split position", e)
+            # Handle failure for all orders that were created
+            for trading_pair in trading_pairs:
+                self._handle_operation_failure(order_ids[trading_pair], trading_pair, "submitting split position", e)
