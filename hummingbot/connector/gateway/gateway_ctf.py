@@ -7,20 +7,26 @@ from hummingbot.core.data_type.common import TradeType
 
 
 class GatewayCtf(GatewayBase):
+    def get_order_size_quantum(self, trading_pair: str, order_size: Decimal) -> Decimal:
+        """Override, always 6 decimals for Polymarket"""
+        return Decimal("1e-6")
+
     async def split_position(self, conditionId: str, trading_pairs: list[str], amount: int, negRisk: bool) -> str:
         gateway_instance = self._get_gateway_instance()
+
+        order_amount = amount * Decimal("1e-6")
 
         order_ids = {}
         for trading_pair in trading_pairs:
             order_id = self.create_market_order_id(TradeType.BUY, trading_pair)
             order_ids[trading_pair] = order_id
-
+            quantized_amount = self.quantize_order_amount(trading_pair, order_amount)
             self.start_tracking_order(
                 order_id=order_id,
                 trading_pair=trading_pair,
                 trade_type=TradeType.BUY,
                 price=Decimal("0.5"),
-                amount=amount
+                amount=quantized_amount
             )
 
         try:
