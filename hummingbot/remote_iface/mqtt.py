@@ -278,7 +278,7 @@ class MQTTCommands:
         response = StatusCommandMessage.Response()
         timeout = 30  # seconds
         try:
-            if self._hb_app.strategy is None:
+            if self._hb_app.trading_core.strategy is None:
                 response.status = MQTT_STATUS_CODE.ERROR
                 response.msg = 'No strategy is currently running!'
                 return response
