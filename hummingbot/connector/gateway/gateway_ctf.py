@@ -24,6 +24,7 @@ class GatewayCtf(GatewayBase):
                 "post",
                 f"connectors/{self.connector_name}/split-position",
                 {
+                    "walletAddress": self.address,
                     "conditionId": conditionId,
                     "amount": amount,
                     "negRisk": negRisk
