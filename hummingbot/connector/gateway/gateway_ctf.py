@@ -35,6 +35,7 @@ class GatewayCtf(GatewayBase):
                     order_id = self.create_market_order_id(TradeType.BUY, trading_pair)
                     order_ids[trading_pair] = order_id
                     quantized_amount = self.quantize_order_amount(trading_pair, order_amount)
+                    # Don't track til there is a signature to avoid SQL error from missing exchange_order_id
                     self.start_tracking_order(
                         order_id=order_id,
                         exchange_order_id=signature,
