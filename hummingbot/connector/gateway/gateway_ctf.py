@@ -16,19 +16,6 @@ class GatewayCtf(GatewayBase):
 
         order_amount = amount * Decimal("1e-6")
 
-        order_ids = {}
-        for trading_pair in trading_pairs:
-            order_id = self.create_market_order_id(TradeType.BUY, trading_pair)
-            order_ids[trading_pair] = order_id
-            quantized_amount = self.quantize_order_amount(trading_pair, order_amount)
-            self.start_tracking_order(
-                order_id=order_id,
-                trading_pair=trading_pair,
-                trade_type=TradeType.BUY,
-                price=Decimal("0.5"),
-                amount=quantized_amount
-            )
-
         try:
             tx = await gateway_instance.api_request(
                 "post",
@@ -43,7 +30,20 @@ class GatewayCtf(GatewayBase):
             signature: Optional[str] = tx.get("signature")
             if signature is not None and signature != "":
                 # Only start tracking orders after we successfully get a transaction hash
+                order_ids = {}
                 for trading_pair in trading_pairs:
+                    order_id = self.create_market_order_id(TradeType.BUY, trading_pair)
+                    order_ids[trading_pair] = order_id
+                    quantized_amount = self.quantize_order_amount(trading_pair, order_amount)
+                    self.start_tracking_order(
+                        order_id=order_id,
+                        exchange_order_id=signature,
+                        trading_pair=trading_pair,
+                        trade_type=TradeType.BUY,
+                        price=Decimal("0.5"),
+                        amount=quantized_amount
+                    )
+
                     self.update_order_from_hash(order_ids[trading_pair], trading_pair, signature, tx)
 
                 return signature
