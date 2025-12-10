@@ -14,7 +14,10 @@ class GatewayCtf(GatewayBase):
     async def split_position(self, conditionId: str, trading_pairs: list[str], amount: int, negRisk: bool) -> str:
         gateway_instance = self._get_gateway_instance()
 
-        order_amount = amount * Decimal("1e-6")
+        order_ids = {}
+        for trading_pair in trading_pairs:
+            order_id = self.create_market_order_id(TradeType.BUY, trading_pair)
+            order_ids[trading_pair] = order_id
 
         try:
             tx = await gateway_instance.api_request(
@@ -30,14 +33,12 @@ class GatewayCtf(GatewayBase):
             signature: Optional[str] = tx.get("signature")
             if signature is not None and signature != "":
                 # Only start tracking orders after we successfully get a transaction hash
-                order_ids = {}
+                order_amount = amount * Decimal("1e-6")
                 for trading_pair in trading_pairs:
-                    order_id = self.create_market_order_id(TradeType.BUY, trading_pair)
-                    order_ids[trading_pair] = order_id
                     quantized_amount = self.quantize_order_amount(trading_pair, order_amount)
                     # Don't track til there is a signature to avoid SQL error from missing exchange_order_id
                     self.start_tracking_order(
-                        order_id=order_id,
+                        order_id=order_ids[trading_pair],
                         exchange_order_id=signature,
                         trading_pair=trading_pair,
                         trade_type=TradeType.BUY,
